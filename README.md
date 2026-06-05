@@ -128,6 +128,59 @@ polynomial diverges), the Hunyuan3D tables, and the math, see the standalone lib
 The acceleration code added by this fork lives in
 `sam3d_objects/model/backbone/generator/flow_matching/{accel,solver,model}.py`.
 
+## Citation
+
+If you use this fork, please cite the base model and the acceleration methods it builds on.
+
+**SAM 3D Objects** (base model):
+
+```bibtex
+@article{sam3dteam2025sam3d3dfyimages,
+      title={SAM 3D: 3Dfy Anything in Images}, 
+      author={SAM 3D Team and Xingyu Chen and Fu-Jen Chu and Pierre Gleize and Kevin J Liang and Alexander Sax and Hao Tang and Weiyao Wang and Michelle Guo and Thibaut Hardin and Xiang Li and Aohan Lin and Jiawei Liu and Ziqi Ma and Anushka Sagar and Bowen Song and Xiaodong Wang and Jianing Yang and Bowen Zhang and Piotr Dollár and Georgia Gkioxari and Matt Feiszli and Jitendra Malik},
+      year={2025},
+      eprint={2511.16624},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2511.16624}, 
+}
+```
+
+**HiCache** (scaled-Hermite velocity forecasting — the polynomial baseline):
+
+```bibtex
+@misc{hicache2025,
+      title={HiCache: Training-free Acceleration of Diffusion Models via Hermite Polynomial Feature Forecasting},
+      eprint={2508.16984},
+      archivePrefix={arXiv},
+      year={2025}
+}
+```
+
+**Dynamic Mode Decomposition** (the exponential basis behind HiCache++):
+
+```bibtex
+@article{schmid2010dmd,
+      title={Dynamic mode decomposition of numerical and experimental data},
+      author={Schmid, Peter J.},
+      journal={Journal of Fluid Mechanics},
+      volume={656},
+      pages={5--28},
+      year={2010}
+}
+```
+
+**Adaptive Guidance**:
+
+```bibtex
+@misc{adaptiveguidance2023,
+      title={Adaptive Guidance: Training-free Acceleration of Conditional Diffusion Models},
+      eprint={2312.12487},
+      archivePrefix={arXiv},
+      year={2023}
+}
+```
+
 ---
 ---
 
