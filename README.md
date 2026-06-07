@@ -10,10 +10,11 @@ network evaluations in the slat-stage flow-matching sampler by **forecasting** t
 [HiCache](https://arxiv.org/abs/2508.16984) polynomial drifts, so it stays lossless at a larger skip
 interval. Generalised to SAM3D's **PyTree** (structured) velocities.*
 
-![training&#8209;free](https://img.shields.io/badge/training--free-%E2%9C%93-2e8f5c)
-&nbsp;![exact&#8209;on&#8209;exponentials](https://img.shields.io/badge/exact%20on-exponentials-2e8f5c)
-&nbsp;![PyTorch](https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white)
-&nbsp;![license SAM](https://img.shields.io/badge/license-SAM-2e6db0)
+[![base: SAM 3D Objects](https://img.shields.io/badge/base-SAM%203D%20Objects-555)](https://github.com/facebookresearch/sam-3d-objects)
+&nbsp;[![arXiv: SAM 3D](https://img.shields.io/badge/arXiv-2511.16624-b5212f?logo=arxiv)](https://arxiv.org/abs/2511.16624)
+&nbsp;[![arXiv: HiCache](https://img.shields.io/badge/arXiv-2508.16984-b5212f?logo=arxiv)](https://arxiv.org/abs/2508.16984)
+&nbsp;[![license: SAM](https://img.shields.io/badge/license-SAM-2e6db0)](./LICENSE)
+&nbsp;![basis: exponential (DMD/Prony)](https://img.shields.io/badge/basis-exponential%20(DMD%2FProny)-2e8f5c)
 
 </div>
 
