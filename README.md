@@ -30,7 +30,7 @@ base generator, and the `+` / `++` suffix is a **method choice**, not a rival pr
 | Hunyuan3D-2 mini | `hunyuan2-plus` | `hunyuan2-plus-plus` |
 | SAM 3D Objects | `sam3d-plus` | `sam3d-plus-plus` |
 | Fast-SAM3D | `fastsam3d-plus` | `fastsam3d-plus-plus` |
-| DiT-XL/2 (ImageNet) | `dit-plus` | `dit-plus-plus` |
+| DiT-XL/2 (ImageNet) | `dit-plus` *(unreleased)* | `dit-plus-plus` *(unreleased)* |
 | TRELLIS (v1) | `faster-trellis` | `faster-trellis-plus-plus` |
 | TRELLIS.2-4B (v2) | `hermit-trellis2` | `hermit-trellis2-plus-plus` |
 
@@ -59,7 +59,7 @@ where the polynomial drifts. As in SAM3D the solver state and backbone velocity 
 vector per step, the propagator is identified once, and the forecast is unflattened back to the tree.
 
 > HiCache++ ships **alongside HiCache (Hermite)** here as the comparison baseline. The forecaster itself
-> is packaged standalone as **[`hicache-plus-plus`](../hicache-plus-plus)**; the pure-Hermite fork is the
+> is packaged standalone as **[`hicache-plus-plus`](https://github.com/Archerkattri/hicache-plus-plus)**; the pure-Hermite fork is the
 > sibling **`sam3d-plus`**.
 
 ## Method
@@ -136,7 +136,7 @@ stay exactly on the baseline geometry up to their respective ceilings.
 
 For the controlled forecast microbenchmark (the exponential basis is ~1e-8 flat in horizon while the
 polynomial diverges), the Hunyuan3D tables, and the math, see the standalone library
-**[`hicache-plus-plus`](../hicache-plus-plus)**.
+**[`hicache-plus-plus`](https://github.com/Archerkattri/hicache-plus-plus)**.
 
 ## Attribution
 
@@ -371,3 +371,12 @@ Model weights and demo/example assets are **not** committed to this repo — onl
 architecture (code + integration). Download the base-model weights from the upstream project,
 [facebookresearch/sam-3d-objects](https://github.com/facebookresearch/sam-3d-objects), per its instructions, and point the loader at them (see the code / upstream README). This
 keeps the repository lightweight and avoids redistributing third-party weights.
+
+---
+
+## Family
+
+Part of the **HiCache++ acceleration family**.
+
+- **Family hub:** [`hicache-plus-plus`](https://github.com/Archerkattri/hicache-plus-plus) — the basis library behind this adapter.
+- **Sibling:** [`sam3d-plus`](https://github.com/Archerkattri/sam3d-plus) — the same base model with the HiCache (scaled-Hermite) polynomial-forecast variant.
