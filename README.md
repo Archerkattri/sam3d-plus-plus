@@ -137,6 +137,21 @@ For the controlled forecast microbenchmark (the exponential basis is ~1e-8 flat 
 polynomial diverges), the Hunyuan3D tables, and the math, see the standalone library
 **[`hicache-plus-plus`](https://github.com/Archerkattri/hicache-plus-plus)**.
 
+
+### hicache-pp 1.2.0 alignment (2026-06-10)
+
+Two updates relative to [hicache-plus-plus 1.2.0](https://github.com/Archerkattri/hicache-plus-plus):
+
+- **Hermite comparison arm corrected.** The vendored Hermite forecast (the HiCache baseline
+  arm, also the DMD warm-up fallback) evaluated the basis at `x = -k`; corrected to `x = +k`
+  (the upstream TaylorSeer distance convention; `-k` flips every odd-order term). The
+  published numbers above were measured with the as-released code and remain valid
+  as-measured. The DMD arm itself is unaffected by the sign convention.
+- **Eigencache not yet vendored.** hicache-plus-plus 1.2.0 caches the DMD eigendecomposition
+  per compute window; the DMD fit vendored here still refits on every skipped step. That is
+  forecast-side latency overhead only (quality is identical); the standalone library ships
+  the cached fit, and porting it here is pending.
+
 ## Attribution
 
 - **SAM 3D Objects** © Meta Platforms, Inc. — model, weights, and code under the [SAM License](./LICENSE)
