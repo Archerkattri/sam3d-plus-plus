@@ -92,7 +92,14 @@ HiCache++ lives on the Euler solver of the slat-stage `FlowMatching` module and 
 `flow_matching/solver.py`, `flow_matching/accel.py`:
 
 ```python
-# fm is the slat-stage FlowMatching module inside the SAM 3D Objects pipeline.
+# Build the same pipeline used by demo.py, then select the named SLaT generator.
+import sys
+from pathlib import Path
+repo = Path.cwd()
+sys.path.insert(0, str(repo / "notebook"))
+from inference import Inference
+inference = Inference("checkpoints/hf/pipeline.yaml", compile=False)
+fm = inference._pipeline.models["slat_generator"]
 # HiCache++ requires the Euler solver (one dynamics_fn eval per step).
 
 fm.enable_dmd(
@@ -114,12 +121,14 @@ fm.enable_adaptive_guidance(gamma_bar=0.94, warmup=2)
 
 fm.disable_hicache()            # disable_hicache() turns off DMD too (shared slot)
 fm.disable_adaptive_guidance()
+cache_telemetry = fm.get_hicache_telemetry()
 ```
 
 `enable_dmd` / `enable_hicache` are also available directly on the solver
 (`ODESolver.enable_dmd(...)`, which sets `backend="dmd"`); the solver resets the per-trajectory cache at
-the start of every run and only activates it for `Euler`. A CPU unit test that needs no GPU or model
-weights — including the DMD exact-on-exponentials and ≥4-snapshot-floor checks — ships in the accel
+the start of every run and only activates it for `Euler`; unsupported solver choices remain dense and
+are reported in telemetry. A CPU unit test that needs no GPU or model weights — including the DMD
+exact-on-exponentials and ≥4-snapshot-floor checks — ships in the accel
 module:
 
 ```bash
@@ -145,19 +154,11 @@ polynomial diverges), the Hunyuan3D tables, and the math, see the standalone lib
 **[`hicache-plus-plus`](https://github.com/Archerkattri/hicache-plus-plus)**.
 
 
-### hicache-pp 1.2.0 alignment (2026-06-10)
+### Central API alignment
 
-Two updates relative to [hicache-plus-plus 1.2.0](https://github.com/Archerkattri/hicache-plus-plus):
-
-- **Hermite comparison arm corrected.** The vendored Hermite forecast (the HiCache baseline
-  arm, also the DMD warm-up fallback) evaluated the basis at `x = -k`; corrected to `x = +k`
-  (the upstream TaylorSeer distance convention; `-k` flips every odd-order term). The
-  published numbers above were measured with the as-released code and remain valid
-  as-measured. The DMD arm itself is unaffected by the sign convention.
-- **Eigencache not yet vendored.** hicache-plus-plus 1.2.0 caches the DMD eigendecomposition
-  per compute window; the DMD fit vendored here still refits on every skipped step. That is
-  forecast-side latency overhead only (quality is identical); the standalone library ships
-  the cached fit, and porting it here is pending.
+The PyTree implementation is maintained by [`hicache-plus-plus`](https://github.com/Archerkattri/hicache-plus-plus),
+pinned here as `hicache-pp>=1.2.1`. The local `accel.py` is a compatibility facade, so DMD fit reuse,
+snapshot ownership, fallback behavior, and telemetry stay aligned with the central implementation.
 
 ## Attribution
 
@@ -401,3 +402,9 @@ Part of the **HiCache++ acceleration family**.
 
 - **Family hub:** [`hicache-plus-plus`](https://github.com/Archerkattri/hicache-plus-plus) — the basis library behind this adapter.
 - **Sibling:** [`sam3d-plus`](https://github.com/Archerkattri/sam3d-plus) — the same base model with the HiCache (scaled-Hermite) polynomial-forecast variant.
+
+## Current release status
+
+The current adapter includes shared HiCache++ cache identity, timing and
+fallback accounting. Four CPU contract tests pass. Real SAM 3D model/CUDA
+execution and output-quality comparisons remain unmeasured.
