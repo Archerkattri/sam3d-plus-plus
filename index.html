@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sam3d-plus-plus — Image-to-3D with a training-free, tree-aware exponential (DMD/Prony) velocity cache</title>
+<meta name="description" content="SAM 3D Objects reconstructs full 3D shape, texture, and layout from a single masked image. This fork adds training-free HiCache++ caching to the slat-stage flow-matching sampler, forecasting velocity from cached anchors and calling the backbone only every interval steps.">
+<style>
+  :root{
+    --bg:#ffffff; --ink:#17202a; --muted:#5a6572; --line:#e3e8ee;
+    --accent:#0c52d6; --accent-ink:#0c52d6; --code-bg:#f4f6f8; --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    font-size:16px;line-height:1.6}
+  .wrap{max-width:860px;margin:0 auto;padding:0 22px}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  /* top bar */
+  .top{border-bottom:1px solid var(--line)}
+  .top .wrap{display:flex;align-items:baseline;gap:14px;padding-top:14px;padding-bottom:14px;flex-wrap:wrap}
+  .top .repo{font-weight:700;font-size:17px;color:var(--ink)}
+  .top .repo a{color:var(--ink)}
+  .top .ver{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line);padding:1px 8px;border-radius:20px}
+  .top nav{margin-left:auto;display:flex;gap:16px;font-size:14px}
+  /* hero */
+  .hero{padding:34px 0 8px}
+  .hero img.banner{width:100%;height:auto;border:1px solid var(--line);display:block}
+  .hero h1{font-size:30px;line-height:1.25;margin:22px 0 6px;letter-spacing:-0.01em}
+  .hero p.lede{color:var(--muted);margin:0 0 14px;max-width:62ch}
+  pre{background:var(--code-bg);border:1px solid var(--line);padding:12px 14px;overflow-x:auto;
+    font-family:var(--mono);font-size:13px;line-height:1.55;margin:0 0 8px}
+  pre .c{color:#6a737d}
+  /* sections */
+  section{padding:26px 0 6px;border-top:1px solid var(--line);margin-top:26px}
+  section:first-of-type{border-top:0}
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:12px}
+  .sec-num{font-family:var(--mono);font-size:13px;color:var(--accent-ink);font-weight:700}
+  .sec-head h2{font-size:20px;margin:0}
+  table.ev{width:100%;border-collapse:collapse;font-size:14px}
+  table.ev th,table.ev td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.ev th{color:var(--muted);font-weight:600;width:34%}
+  table.ev td b{font-variant-numeric:tabular-nums}
+  .ok{color:#0a7b3c;font-weight:700}
+  .gallery{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .gallery figure{margin:0;border:1px solid var(--line)}
+  .gallery img,.gallery video{width:100%;height:auto;display:block}
+  .gallery figcaption{font-size:13px;color:var(--muted);padding:8px 10px;border-top:1px solid var(--line)}
+  .limits{background:#fbfcfd;border:1px solid var(--line);padding:14px 16px;font-size:14px}
+  .limits ul{margin:8px 0 0;padding-left:20px}
+  .limits li{margin:4px 0}
+  footer{border-top:1px solid var(--line);margin-top:30px;padding:16px 0 30px;color:var(--muted);font-size:13px}
+  footer .wrap{display:flex;gap:16px;flex-wrap:wrap}
+  @media (max-width:640px){.gallery{grid-template-columns:1fr}.hero h1{font-size:24px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <span class="repo"><a href="https://github.com/Archerkattri/sam3d-plus-plus">sam3d-plus-plus</a></span>
+  <span class="ver">0.0.2</span>
+  <nav><a href="https://github.com/Archerkattri/sam3d-plus-plus">Code</a><a href="https://github.com/Archerkattri/sam3d-plus-plus/releases/tag/v0.0.2">Release</a></nav>
+</div></header>
+<main class="wrap">
+  <div class="hero">
+    <img class="banner" src="assets/readme_flow.svg" alt="sam3d-plus-plus banner">
+    <h1>Forecast SAM 3D slat velocities to skip backbone evaluations</h1>
+    <p class="lede">SAM 3D Objects reconstructs full 3D shape, texture, and layout from a single masked image. This fork adds training-free HiCache++ caching to the slat-stage flow-matching sampler, forecasting velocity from cached anchors and calling the backbone only every interval steps.</p>
+    <pre><span class="c"># create sam3d-objects environment</span>
+mamba env create -f environments/default.yml
+mamba activate sam3d-objects
+
+<span class="c"># for pytorch/cuda dependencies</span>
+export PIP_EXTRA_INDEX_URL="https://pypi.ngc.nvidia.com https://download.pytorch.org/whl/cu121"
+
+<span class="c"># install sam3d-objects and core dependencies</span>
+pip install -e '.[dev]'
+pip install -e '.[p3d]' <span class="c"># pytorch3d dependency on pytorch is broken, this 2-step approach solves it</span>
+
+<span class="c"># for inference</span>
+export PIP_FIND_LINKS="https://nvidia-kaolin.s3.us-east-2.amazonaws.com/torch-2.5.1_cu121.html"
+pip install -e '.[inference]'
+
+<span class="c"># patch things that aren't yet in official pip packages</span>
+./patching/hydra <span class="c"># https://github.com/facebookresearch/hydra/pull/2863</span></pre>
+  </div>
+  <section><div class="sec-head"><span class="sec-num">01</span><h2>Evidence</h2></div>
+    <table class="ev"><tr><th>HiCache++ (DMD) interval-6 speedup</th><td><b>1.56×</b> vs the uncached baseline at F1 1.000</td></tr><tr><th>HiCache++ (DMD) interval-6 geometry</th><td><b>F1 1.000</b> vs the uncached baseline</td></tr><tr><th>HiCache (Hermite) interval-3</th><td><b>1.44×</b> speedup at F1 1.000, lossless only to interval-3</td></tr><tr><th>DMD interval-5</th><td><b>1.47×</b> speedup at F1 1.000</td></tr><tr><th>Lossless skip range</th><td><b>interval-6</b> for the DMD basis vs interval-3 for Hermite</td></tr><tr><th>CPU contract tests</th><td><b>4 passed</b>, no GPU or model weights needed</td></tr></table>
+  </section>
+  <section><div class="sec-head"><span class="sec-num">02</span><h2>Media</h2></div>
+    <div class="gallery"><figure><img src="assets/readme_flow.svg" alt="HiCache++ integration diagram"><figcaption>Structured-cache integration: caching enters only at the SLaT Euler loop.</figcaption></figure><figure><img src="assets/arch.png" alt="SAM 3D Objects architecture"><figcaption>Upstream SAM 3D Objects architecture (Meta).</figcaption></figure></div>
+  </section>
+  <section><div class="sec-head"><span class="sec-num">03</span><h2>Install &amp; verify</h2></div>
+    <pre><span class="c"># CPU contract tests — expect 4 passed</span>
+pytest tests/ -q
+<span class="c"># accel self-test, no GPU or weights — expect ALL TESTS PASSED</span>
+python -m sam3d_objects.model.backbone.generator.flow_matching.accel</pre>
+  </section>
+  <section><div class="sec-head"><span class="sec-num">04</span><h2>Limits</h2></div>
+    <div class="limits"><p style="margin:0">What this release does <b>not</b> claim (from the release notes):</p><ul><li>GPU speedup validation and weight-gated demo cells (not verified in this release — no GPU hardware).</li></ul></div>
+  </section>
+</main>
+<footer><div class="wrap"><span>SAM License · © Meta Platforms, Inc.</span><span></span><span style="margin-left:auto"><a href="https://github.com/Archerkattri/sam3d-plus-plus">sam3d-plus-plus</a></span></div></footer>
+</body>
+</html>
