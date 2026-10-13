@@ -133,13 +133,8 @@ cache_telemetry = fm.get_hicache_telemetry()
 `enable_dmd` / `enable_hicache` are also available directly on the solver
 (`ODESolver.enable_dmd(...)`, which sets `backend="dmd"`); the solver resets the per-trajectory cache at
 the start of every run and only activates it for `Euler`; unsupported solver choices remain dense and
-are reported in telemetry. A CPU unit test that needs no GPU or model weights — including the DMD
-exact-on-exponentials and ≥4-snapshot-floor checks — ships in the accel
-module:
-
-```bash
-python -m sam3d_objects.model.backbone.generator.flow_matching.accel
-```
+are reported in telemetry. The released package no longer embeds or ships a
+unit-test entry point in the acceleration module.
 
 ## Results
 
